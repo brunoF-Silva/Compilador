@@ -29,7 +29,7 @@ class AnalisadorSintatico:
     def program(self):
         #Enquanto não encontrar EOF, para cada token consuma 
         while not self.checarToken(Token("Delimitador", "EOF")):
-            self.declaration()
+            self.declaration() # Começa todo o processo de verificação
         self.consumir(Token("Delimitador", "EOF"))
 
 
@@ -129,11 +129,11 @@ class AnalisadorSintatico:
     def block(self):
         self.consumir(Token("Delimitador", "{"))
         while not self.checarToken(Token("Delimitador", "}")):
-            self.declaration()  
+            self.declaration() # começa a verificação outra vez  
         self.consumir(Token("Delimitador", "}"))
 
     def exprStmt(self):
-        self.assignment()
+        self.assignment() # Verifica uma atribuição ou a lógica or ...
         if self.checarToken(Token("Delimitador", ";")):
             self.consumir(Token("Delimitador", ";"))
         else:
@@ -174,11 +174,11 @@ class AnalisadorSintatico:
             self.expression()
         self.consumir(Token("Delimitador", ";"))
     
-    # Cria um assignment que é a prota de entrada para verificar, em ordem,
+    # Cria um assignment que é a porta de entrada para verificar, em ordem,
     # o que um token é e se sua existência está correta para as regras da linguagem
     def expression(self):
         self.assignment()
-    #
+    # Verifica uma atribuição ou a lógica or
     def assignment(self):
         #Se o token for um identificador
         if self.checarToken(Token("Identificador", self.tokens[self.indice].valor)):
