@@ -16,7 +16,6 @@ class AnalisadorSintatico:
     def __init__(self, tokens):
         self.tokens = tokens
         self.indice = 0
-        self.traducao = ""
 
     def analisar(self):
         self.program() 
@@ -71,15 +70,18 @@ class AnalisadorSintatico:
     def forStmt(self):
         self.consumir(Token("Palavra reservada", "for"))
         self.consumir(Token("Delimitador", "("))
+
         if self.checarToken(Token("Palavra reservada", "var")):
             self.varDecl()
         elif self.checarToken(Token("Delimitador", ";")):
             self.consumir(Token("Delimitador", ";"))
         else:
             self.exprStmt()
+        
         if not self.checarToken(Token("Delimitador", ";")):
             self.expression() # cria um uma atribuição (assignment)
         self.consumir(Token("Delimitador", ";"))
+        
         if not self.checarToken(Token("Delimitador", ")")):
             self.expression()
         self.consumir(Token("Delimitador", ")"))
@@ -172,7 +174,8 @@ class AnalisadorSintatico:
             self.expression()
         self.consumir(Token("Delimitador", ";"))
     
-    # Cria um assignment
+    # Cria um assignment que é a prota de entrada para verificar, em ordem,
+    # o que um token é e se sua existência está correta para as regras da linguagem
     def expression(self):
         self.assignment()
     #
