@@ -13,9 +13,12 @@ class ErroSintaticoException(Exception):
 
 
 class AnalisadorSintatico:
+    print('análise sintatica')
     def __init__(self, tokens):
         self.tokens = tokens
         self.indice = 0
+        self.tipo_anterior = ""
+        self.valor_anterior = ""
         self.traducao = ""
         self.funcoes = {}
         self.variaveis = {}
@@ -32,21 +35,13 @@ class AnalisadorSintatico:
 
         print("Análise sintática concluída com sucesso. A tradução foi salva no arquivo 'traducao.py'.")
 
-    def checarToken(self, tipo, valor=None):
-        if self.indice >= len(self.tokens):
-            return False
-        token_atual = self.tokens[self.indice]
-        print('checarToken vai analisar ', token_atual.tipo, token_atual.valor)
-        if valor is not None:
-            print('retornou  valor e tipo', valor)
-            print(token_atual.tipo == tipo and token_atual.valor == valor)
-            return token_atual.tipo == tipo and token_atual.valor == valor
-        print('retornou só tipo: ', token_atual.tipo)
-        return token_atual.tipo == tipo
 
     def consumir(self, tipo, valor=None):
         print('>>>>consumir chama checarToken passando', tipo, valor)
         if self.checarToken(tipo, valor):
+            self.valor_anterior = self.tokens[self.indice].valor
+            self.tipo_anterior = self.tokens[self.indice].tipo
+
             print(f"Consumindo token: {self.tokens[self.indice]}")
             self.indice += 1
             print('FIM DE CONSUMIR')
@@ -56,22 +51,51 @@ class AnalisadorSintatico:
             raise ErroSintaticoException(
                 self.tokens[self.indice], token_esperado)
 
+    def checarToken(self, tipo, valor=None):
+        if self.indice >= len(self.tokens):
+            return False
+        token_atual = self.tokens[self.indice]
+        print('checarToken vai analisar ', token_atual.tipo, token_atual.valor,'mas tem ', valor, ' ', tipo)
+        if token_atual.valor == 'EOF':
+            self.tokens[self.indice] = Token('Delimitador', 'EOF')
+        if valor is not None:
+            print('retornou  valor e tipo', valor)
+            print(token_atual.tipo == tipo and token_atual.valor == valor)
+            return token_atual.tipo == tipo and token_atual.valor == valor
+        print('retornou só tipo: ', token_atual.tipo)
+        return token_atual.tipo == tipo
         
     def expression(self):
-        print('-------nova expressão, a próxima é: ', self.tokens[self.indice+1].valor)
+        print('-------nova expressão para ', self.tokens[self.indice].valor, ' a próxima é: ', self.tokens[self.indice+1].valor)
         self.traducao += self.tokens[self.indice].valor
-        print('!!!!consumir foi chamada passando', self.tokens[self.indice].tipo, self.tokens[self.indice].valor)
-        self.consumir(self.tokens[self.indice].tipo)
+        if self.indice-1 > -1:
+            if self.valor_anterior == 'return' or self.tipo_anterior == 'Identificador':
+                print('CUUUUUUUUUUUUUUUUUUUU')
+                while self.tokens[self.indice].valor != ';':
+                    print('!!!!consumir foi chamada passando', self.tokens[self.indice].tipo, self.tokens[self.indice].valor)
+                    self.consumir(self.tokens[self.indice].tipo)
+            else:
+                print('!!!!consumir foi chamada 1 vez passando', self.tokens[self.indice].tipo, self.tokens[self.indice].valor)
+                self.consumir(self.tokens[self.indice].tipo)
+                print('BUXECS ', self.valor_anterior)
+
+        else:
+            print('BUXECS ', self.valor_anterior)
+            print('!!!!consumir foi chamada 1 vez passando', self.tokens[self.indice].tipo, self.tokens[self.indice].valor)
+
+            self.consumir(self.tokens[self.indice].tipo)
+
         print("FIM  DE EXPRESSION")
         
     def returnStmt(self):
         print("RETUUUUUUUUURRRRRRRRNNNN")
         self.consumir("Palavra reservada", "return")
         self.traducao += "return "
+        print('1')
         if not self.checarToken("Delimitador", ";"):
-            print("VAMO CHAMAR EXPRESSION POIS NADA DE ; NO RETURN")
+            print(2)
+            print('chama expression')
             self.expression()
-            print('++++++++++ Saiu de expression mais vamos de novo')
         self.consumir("Delimitador", ";")
         print("FIM DE RETURN STATEMENT")
         

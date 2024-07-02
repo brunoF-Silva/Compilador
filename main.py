@@ -26,7 +26,7 @@ from Semantico import AnalisadorSintatico, ErroSintaticoException
 
 
 def main():
-    arquivo = "testes/exemplo5.c"
+    arquivo = "exemplo5.c"
 
     analisador_lexico = AnalisadorLexico(arquivo)
     analisador_lexico.analisar_e_mostrar_resultado()
