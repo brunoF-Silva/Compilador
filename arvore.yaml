@@ -1,0 +1,129 @@
+program:
+  - while:
+      checarToken:
+        tipo: Delimitador
+        valor: EOF
+      do:
+        - declaration:
+            - checarToken:
+                tipo: Palavra reservada
+                valor: fun
+            - if: true
+              then:
+                funDecl:
+                  - consumir:
+                      token_esperado: fun
+                  - function:
+                      - consumir:
+                          token_esperado: Identificador
+                          valor: myFunction
+                      - consumir:
+                          token_esperado: Delimitador
+                          valor: "("
+                      - checarToken:
+                          tipo: Delimitador
+                          valor: ")"
+                      - if: true
+                        then:
+                          - consumir:
+                              token_esperado: Delimitador
+                              valor: ")"
+                        else:
+                          parameters: []
+                      - block:
+                          - consumir:
+                              token_esperado: Delimitador
+                              valor: "{"
+                          - while:
+                              checarToken:
+                                tipo: Delimitador
+                                valor: "}"
+                              do:
+                                - declaration:
+                                    - checarToken:
+                                        tipo: Palavra reservada
+                                        valor: var
+                                    - if: true
+                                      then:
+                                        varDecl:
+                                          - consumir:
+                                              token_esperado: var
+                                          - consumir:
+                                              token_esperado: Identificador
+                                              valor: x
+                                          - checarToken:
+                                              tipo: Operador
+                                              valor: "="
+                                          - if: true
+                                            then:
+                                              - consumir:
+                                                  token_esperado: Operador
+                                                  valor: "="
+                                              - expression:
+                                                  - assignment:
+                                                      - checarToken:
+                                                          tipo: Identificador
+                                                          valor: x
+                                                      - if: true
+                                                        then:
+                                                          - consumir:
+                                                              token_esperado: Identificador
+                                                              valor: x
+                                                          - checarToken:
+                                                              tipo: Operador
+                                                              valor: "="
+                                                          - if: false
+                                                            then: []
+                                                            else:
+                                                              tokenAnterior:
+                                                                indice: -1
+                                                              logic_or: []
+                                                        else:
+                                                          logic_or: []
+                                            else:
+                                              logic_or: []
+                                          - consumir:
+                                              token_esperado: Delimitador
+                                              valor: ";"
+                                    - checarToken:
+                                        tipo: Palavra reservada
+                                        valor: print
+                                    - if: true
+                                      then:
+                                        statement:
+                                          printStmt:
+                                            - consumir:
+                                                token_esperado: print
+                                            - expression:
+                                                - assignment:
+                                                    - checarToken:
+                                                        tipo: Identificador
+                                                        valor: x
+                                                    - if: true
+                                                      then:
+                                                        - consumir:
+                                                            token_esperado: Identificador
+                                                            valor: x
+                                                        - checarToken:
+                                                            tipo: Operador
+                                                            valor: "="
+                                                        - if: false
+                                                          then: []
+                                                          else:
+                                                            tokenAnterior:
+                                                              indice: -1
+                                                            logic_or: []
+                                                      else:
+                                                        logic_or: []
+                                            - consumir:
+                                                token_esperado: Delimitador
+                                                valor: ";"
+                                    - checarToken:
+                                        tipo: Delimitador
+                                        valor: "}"
+                          - consumir:
+                              token_esperado: Delimitador
+                              valor: "}"
+      - consumir:
+          token_esperado: Delimitador
+          valor: EOF
