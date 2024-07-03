@@ -108,7 +108,10 @@ class AnalisadorLexico:
 
     def tokenizar(self, conteudo):
         regex = re.compile(
-             r'\+|\d+[a-zA-Z_]*\b|[a-zA-Z_]+[a-zA-Z0-9_]*\b|["\'][^"\']*["\']|[+-]?\d+\.\d+|->|&&|\|\||\-\-|\+\+|[-+*/%&=!><\|]=?|[-+*/%&=!><\|]|\||\(|\)|\[|\]|\{|\}|\.|,|;')
+            r'[+-]?\d+\.\d+|\+|\b\d+\b|[a-zA-Z_]+[a-zA-Z0-9_]*\b|["\'][^"\']*["\']|->|&&|\|\||\-\-|\+\+|[-+*/%&=!><\|]=?|[-+*/%&=!><\|]|\||\(|\)|\[|\]|\{|\}|\.|,|;')
+
+        # regex = re.compile(
+        #      r'\+|\d+[a-zA-Z_]*\b|[a-zA-Z_]+[a-zA-Z0-9_]*\b|["\'][^"\']*["\']|[+-]?\d+\.\d+|->|&&|\|\||\-\-|\+\+|[-+*/%&=!><\|]=?|[-+*/%&=!><\|]|\||\(|\)|\[|\]|\{|\}|\.|,|;')
         valores_tokens = regex.findall(conteudo)
         tokens = [self.obter_tipo_token(valor) for valor in valores_tokens]
         tokens.append(Token("Delimitador", "EOF"))
@@ -119,10 +122,12 @@ class AnalisadorLexico:
             return Token("Palavra reservada", valor)
         elif re.match(self.operadores, valor):
             return Token("Operador", valor)
-        elif re.match(self.inteiros, valor):
-            return Token("Numero", valor)  # Inteiro
+        # elif re.match(self.inteiros, valor):
+        #     return Token("Numero", valor)  # Inteiro
         elif re.match(self.ponto_flutuante, valor):
-            return Token("Numero", valor)  # Ponto Flutuante
+            return Token("Ponto Flutuante", valor)  # Ponto Flutuante
+        elif re.match(self.inteiros, valor):
+            return Token("Inteiro", valor)  # Ponto Flutuante
         elif valor in self.delimitadores:
             return Token("Delimitador", valor)
         elif re.match(self.identificadores, valor):
