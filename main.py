@@ -22,7 +22,7 @@
 #     main()
 
 from AnalisadorLexico import AnalisadorLexico
-from Semantico import AnalisadorSintatico, ErroSintaticoException
+from AnalisadorSintatico import AnalisadorSintatico, ErroSintaticoException
 
 
 def main():

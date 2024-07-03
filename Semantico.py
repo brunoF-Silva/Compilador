@@ -13,12 +13,9 @@ class ErroSintaticoException(Exception):
 
 
 class AnalisadorSintatico:
-    print('análise sintatica')
     def __init__(self, tokens):
         self.tokens = tokens
         self.indice = 0
-        self.tipo_anterior = ""
-        self.valor_anterior = ""
         self.traducao = ""
         self.funcoes = {}
         self.variaveis = {}
@@ -35,70 +32,23 @@ class AnalisadorSintatico:
 
         print("Análise sintática concluída com sucesso. A tradução foi salva no arquivo 'traducao.py'.")
 
-
-    def consumir(self, tipo, valor=None):
-        print('>>>>consumir chama checarToken passando', tipo, valor)
-        if self.checarToken(tipo, valor):
-            self.valor_anterior = self.tokens[self.indice].valor
-            self.tipo_anterior = self.tokens[self.indice].tipo
-
-            print(f"Consumindo token: {self.tokens[self.indice]}")
-            self.indice += 1
-            print('FIM DE CONSUMIR')
-        else:
-            return False
-            token_esperado = f"{tipo}('{valor}')" if valor else tipo
-            raise ErroSintaticoException(
-                self.tokens[self.indice], token_esperado)
-
     def checarToken(self, tipo, valor=None):
         if self.indice >= len(self.tokens):
             return False
         token_atual = self.tokens[self.indice]
-        print('checarToken vai analisar ', token_atual.tipo, token_atual.valor,'mas tem ', valor, ' ', tipo)
-        if token_atual.valor == 'EOF':
-            self.tokens[self.indice] = Token('Delimitador', 'EOF')
         if valor is not None:
-            print('retornou  valor e tipo', valor)
-            print(token_atual.tipo == tipo and token_atual.valor == valor)
             return token_atual.tipo == tipo and token_atual.valor == valor
-        print('retornou só tipo: ', token_atual.tipo)
         return token_atual.tipo == tipo
-        
-    def expression(self):
-        print('-------nova expressão para ', self.tokens[self.indice].valor, ' a próxima é: ', self.tokens[self.indice+1].valor)
-        self.traducao += self.tokens[self.indice].valor
-        if self.indice-1 > -1:
-            if self.valor_anterior == 'return' or self.tipo_anterior == 'Identificador':
-                print('CUUUUUUUUUUUUUUUUUUUU')
-                while self.tokens[self.indice].valor != ';':
-                    print('!!!!consumir foi chamada passando', self.tokens[self.indice].tipo, self.tokens[self.indice].valor)
-                    self.consumir(self.tokens[self.indice].tipo)
-            else:
-                print('!!!!consumir foi chamada 1 vez passando', self.tokens[self.indice].tipo, self.tokens[self.indice].valor)
-                self.consumir(self.tokens[self.indice].tipo)
-                print('BUXECS ', self.valor_anterior)
 
+    def consumir(self, tipo, valor=None):
+        if self.checarToken(tipo, valor):
+            print(f"Consumindo token: {self.tokens[self.indice]}")
+            self.indice += 1
         else:
-            print('BUXECS ', self.valor_anterior)
-            print('!!!!consumir foi chamada 1 vez passando', self.tokens[self.indice].tipo, self.tokens[self.indice].valor)
+            token_esperado = f"{tipo}('{valor}')" if valor else tipo
+            raise ErroSintaticoException(
+                self.tokens[self.indice], token_esperado)
 
-            self.consumir(self.tokens[self.indice].tipo)
-
-        print("FIM  DE EXPRESSION")
-        
-    def returnStmt(self):
-        print("RETUUUUUUUUURRRRRRRRNNNN")
-        self.consumir("Palavra reservada", "return")
-        self.traducao += "return "
-        print('1')
-        if not self.checarToken("Delimitador", ";"):
-            print(2)
-            print('chama expression')
-            self.expression()
-        self.consumir("Delimitador", ";")
-        print("FIM DE RETURN STATEMENT")
-        
     def program(self):
         while not self.checarToken("EOF"):
             self.declaration()
@@ -164,26 +114,13 @@ class AnalisadorSintatico:
             self.exprStmt()
 
     def exprStmt(self):
-        self.assignment()
+        self.expression()
         if self.checarToken("Delimitador", ";"):
             self.consumir("Delimitador", ";")
             self.traducao += "\n"
         else:
             raise ErroSintaticoException(
                 f"{self.tokens[self.indice].tipo} '{self.tokens[self.indice].valor}'")
-# Novo código:   
-    # def exprStmt(self):
-    #     if self.checarToken("Palavra reservada", "return"):
-    #         self.returnStmt()
-    #     else:
-    #         self.assignment()
-    #         if self.checarToken("Delimitador", ";"):
-    #             self.consumir("Delimitador", ";")
-    #             self.traducao += "\n"
-    #         else:
-    #             raise ErroSintaticoException(
-    #                 f"{self.tokens[self.indice].tipo} '{self.tokens[self.indice].valor}'")
-
 
     def forStmt(self):
         self.consumir("Palavra reservada", "for")
@@ -220,14 +157,12 @@ class AnalisadorSintatico:
         self.traducao += ")"
         self.consumir("Delimitador", ";")
 
-#Novo código:
-    # def returnStmt(self):
-    #     self.consumir("Palavra reservada", "return")
-    #     self.traducao += "return "
-    #     if not self.checarToken("Delimitador", ";"):
-    #         self.expression()
-    #     self.consumir("Delimitador", ";")
-
+    def returnStmt(self):
+        self.consumir("Palavra reservada", "return")
+        self.traducao += "return "
+        if not self.checarToken("Delimitador", ";"):
+            self.expression()
+        self.consumir("Delimitador", ";")
 
     def whileStmt(self):
         self.consumir("Palavra reservada", "while")
@@ -258,42 +193,49 @@ class AnalisadorSintatico:
         else:
             self.expression()
 
-# código que eu me confundi (mas acho que é igual ao de baixo, portanto julgo ser o original)
-# def primary(self):
-#     if self.checarToken("Identificador"):
-#         nome_var = self.tokens[self.indice].valor
-#         if nome_var not in self.variaveis and nome_var not in self.funcoes:
-#             raise ErroSintaticoException(f"Variável ou função '{nome_var}' não declarada.")
-#         self.traducao += nome_var
-#         self.consumir("Identificador")
-#         if self.checarToken("Delimitador", "("):
-#             self.consumir("Delimitador", "(")
-#             if nome_var not in self.funcoes:
-#                 raise ErroSintaticoException(f"'{nome_var}' não é uma função.")
-#             self.argumentos()
-#             self.consumir("Delimitador", ")")
-#     elif self.checarToken("Constante Textual"):
-#         self.traducao += self.tokens[self.indice].valor
-#         self.consumir("Constante Textual")
-#     elif self.checarToken("Inteiro"):
-#         self.traducao += self.tokens[self.indice].valor
-#         self.consumir("Inteiro")
-#     elif self.checarToken("Ponto Flutuante"):
-#         self.traducao += self.tokens[self.indice].valor
-#         self.consumir("Ponto Flutuante")
-#     elif self.checarToken("Delimitador", "("):
-#         self.consumir("Delimitador", "(")
-#         self.expression()
-#         self.consumir("Delimitador", ")")
-#     else:
-#         raise ErroSintaticoException(f"Token inesperado: {self.tokens[self.indice]}")
-    
-#     if self.checarToken("Operador", "*") or self.checarToken("Operador", "/"):
-#         self.traducao += self.tokens[self.indice].valor
-#         self.consumir("Operador")
+    def expression(self):
+        self.equality()
 
-#     if self.checarToken("Operador", "+") or self.checarToken("Operador", "-"):
-#         raise ErroSintaticoException(f"Operador inesperado: {self.tokens[self.indice]}")
+    def equality(self):
+        self.comparison()
+        while self.checarToken("Operador", "==") or self.checarToken("Operador", "!="):
+            operador = self.tokens[self.indice].valor
+            self.consumir("Operador", operador)
+            self.traducao += f" {operador} "
+            self.comparison()
+
+    def comparison(self):
+        self.term()
+        while self.checarToken("Operador", "<") or self.checarToken("Operador", "<=") or self.checarToken("Operador", ">") or self.checarToken("Operador", ">="):
+            operador = self.tokens[self.indice].valor
+            self.consumir("Operador", operador)
+            self.traducao += f" {operador} "
+            self.term()
+
+    def term(self):
+        self.factor()
+        while self.checarToken("Operador", "+") or self.checarToken("Operador", "-"):
+            operador = self.tokens[self.indice].valor
+            self.consumir("Operador", operador)
+            self.traducao += f" {operador} "
+            self.factor()
+
+    def factor(self):
+        self.unary()
+        while self.checarToken("Operador", "*") or self.checarToken("Operador", "/"):
+            operador = self.tokens[self.indice].valor
+            self.consumir("Operador", operador)
+            self.traducao += f" {operador} "
+            self.unary()
+
+    def unary(self):
+        if self.checarToken("Operador", "-") or self.checarToken("Operador", "!"):
+            operador = self.tokens[self.indice].valor
+            self.consumir("Operador", operador)
+            self.traducao += f"{operador}"
+            self.unary()
+        else:
+            self.primary()
 
     def primary(self):
         if self.checarToken("Identificador"):
@@ -304,28 +246,41 @@ class AnalisadorSintatico:
             self.traducao += nome_var
             self.consumir("Identificador")
             if self.checarToken("Delimitador", "("):
-                self.consumir("Delimitador", "(")
-                if nome_var not in self.funcoes:
-                    raise ErroSintaticoException(
-                        f"'{nome_var}' não é uma função.")
-                self.argumentos()
-                self.consumir("Delimitador", ")")
-        elif self.checarToken("Constante Textual"):
+                self.functionCall()
+        elif self.checarToken("Numero"):
             self.traducao += self.tokens[self.indice].valor
-            self.consumir("Constante Textual")
-        elif self.checarToken("Inteiro"):
-            self.traducao += self.tokens[self.indice].valor
-            self.consumir("Inteiro")
-        elif self.checarToken("Ponto Flutuante"):
-            self.traducao += self.tokens[self.indice].valor
-            self.consumir("Ponto Flutuante")
+            self.consumir("Numero")
+        elif self.checarToken("String"):
+            self.traducao += f'"{self.tokens[self.indice].valor}"'
+            self.consumir("String")
+        elif self.checarToken("Palavra reservada", "nil"):
+            self.traducao += "None"
+            self.consumir("Palavra reservada", "nil")
+        elif self.checarToken("Palavra reservada", "true"):
+            self.traducao += "True"
+            self.consumir("Palavra reservada", "true")
+        elif self.checarToken("Palavra reservada", "false"):
+            self.traducao += "False"
+            self.consumir("Palavra reservada", "false")
+        elif self.checarToken("Delimitador", "("):
+            self.consumir("Delimitador", "(")
+            self.expression()
+            self.consumir("Delimitador", ")")
         else:
             raise ErroSintaticoException(
-                f"Token inesperado: {self.tokens[self.indice]}")
+                f"{self.tokens[self.indice].tipo} '{self.tokens[self.indice].valor}'")
 
-    def argumentos(self):
+    def functionCall(self):
+        self.consumir("Delimitador", "(")
+        self.traducao += "("
         if not self.checarToken("Delimitador", ")"):
+            self.arguments()
+        self.consumir("Delimitador", ")")
+        self.traducao += ")"
+
+    def arguments(self):
+        self.expression()
+        while self.checarToken("Delimitador", ","):
+            self.consumir("Delimitador", ",")
+            self.traducao += ", "
             self.expression()
-            while self.checarToken("Delimitador", ","):
-                self.consumir("Delimitador", ",")
-                self.expression()

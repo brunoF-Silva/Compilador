@@ -120,9 +120,9 @@ class AnalisadorLexico:
         elif re.match(self.operadores, valor):
             return Token("Operador", valor)
         elif re.match(self.inteiros, valor):
-            return Token("Inteiro", valor)
+            return Token("Numero", valor)  # Inteiro
         elif re.match(self.ponto_flutuante, valor):
-            return Token("Ponto Flutuante", valor)
+            return Token("Numero", valor)  # Ponto Flutuante
         elif valor in self.delimitadores:
             return Token("Delimitador", valor)
         elif re.match(self.identificadores, valor):

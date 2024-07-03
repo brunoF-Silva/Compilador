@@ -72,9 +72,9 @@ class AnalisadorSintatico:
     def varDecl(self):
         self.consumir(Token("Palavra reservada", "var"))
         identificador = self.tokens[self.indice].valor
-        self.consumir(Token("Identificador", self.tokens[self.indice].valor))
+        self.consumir(Token("Identificador", identificador))
         self.variaveis_declaradas.add(identificador)
-        self.traducao += self.tokens[self.indice - 1].valor
+        self.traducao += identificador
         if self.checarToken(Token("Operador", "=")):
             self.consumir(Token("Operador", "="))
             self.traducao += " = "
@@ -189,19 +189,15 @@ class AnalisadorSintatico:
     def expression(self):
         self.assignment()
 
-
     def assignment(self):
-
         if self.checarToken(Token("Identificador", self.tokens[self.indice].valor)):
             identificador = self.tokens[self.indice].valor
             if identificador not in self.variaveis_declaradas:
                 raise ErroSintaticoException(
                     f"Variável '{identificador}' não declarada.")
-            self.consumir(
-                Token("Identificador", self.tokens[self.indice].valor))
-            # self.traducao += self.tokens[self.indice - 1].valor
+            self.consumir(Token("Identificador", identificador))
             if self.checarToken(Token("Operador", "=")):
-                self.traducao += self.tokens[self.indice - 1].valor
+                self.traducao += identificador
                 self.consumir(Token("Operador", "="))
                 self.traducao += " = "
                 self.assignment()
@@ -234,16 +230,11 @@ class AnalisadorSintatico:
             elif self.checarToken(Token("Operador", "==")):
                 self.consumir(Token("Operador", "=="))
                 self.traducao += " == "
-            else:
-                raise ErroSintaticoException(
-                    self.tokens[self.indice], "Operador de inválido")
-
             self.comparison()
 
     def comparison(self):
         self.term()
-        while self.checarToken(Token("Operador", ">")) or self.checarToken(Token("Operador", ">=")) or \
-                self.checarToken(Token("Operador", "<")) or self.checarToken(Token("Operador", "<=")):
+        while self.checarToken(Token("Operador", ">")) or self.checarToken(Token("Operador", ">=")) or self.checarToken(Token("Operador", "<")) or self.checarToken(Token("Operador", "<=")):
             if self.checarToken(Token("Operador", ">")):
                 self.consumir(Token("Operador", ">"))
                 self.traducao += " > "
@@ -256,25 +247,17 @@ class AnalisadorSintatico:
             elif self.checarToken(Token("Operador", "<=")):
                 self.consumir(Token("Operador", "<="))
                 self.traducao += " <= "
-            else:
-                raise ErroSintaticoException(
-                    self.tokens[self.indice], "Operador de inválido")
-
             self.term()
 
     def term(self):
         self.factor()
-        while self.checarToken(Token("Operador", "+")) or self.checarToken(Token("Operador", "-")):
-            if self.checarToken(Token("Operador", "+")):
-                self.consumir(Token("Operador", "+"))
-                self.traducao += " + "
-            elif self.checarToken(Token("Operador", "-")):
+        while self.checarToken(Token("Operador", "-")) or self.checarToken(Token("Operador", "+")):
+            if self.checarToken(Token("Operador", "-")):
                 self.consumir(Token("Operador", "-"))
                 self.traducao += " - "
-            else:
-                raise ErroSintaticoException(
-                    self.tokens[self.indice], "Operador de inválido")
-
+            elif self.checarToken(Token("Operador", "+")):
+                self.consumir(Token("Operador", "+"))
+                self.traducao += " + "
             self.factor()
 
     def factor(self):
@@ -286,48 +269,19 @@ class AnalisadorSintatico:
             elif self.checarToken(Token("Operador", "*")):
                 self.consumir(Token("Operador", "*"))
                 self.traducao += " * "
-            else:
-                raise ErroSintaticoException(
-                    self.tokens[self.indice], "Operador de inválido")
-
             self.unary()
 
     def unary(self):
         if self.checarToken(Token("Operador", "!")):
             self.consumir(Token("Operador", "!"))
-            self.traducao += "not "
+            self.traducao += " not "
             self.unary()
         elif self.checarToken(Token("Operador", "-")):
             self.consumir(Token("Operador", "-"))
             self.traducao += "-"
             self.unary()
         else:
-            self.call()
-
-    def call(self):
-        print('_______________')
-        self.primary()
-        while self.checarToken(Token("Delimitador", "(")) or self.checarToken(Token("Operador", ".")):
-            if self.checarToken(Token("Delimitador", "(")):
-                self.consumir(Token("Delimitador", "("))
-                self.traducao += "("
-                if not self.checarToken(Token("Delimitador", ")")):
-                    self.arguments()
-                self.consumir(Token("Delimitador", ")"))
-                self.traducao += ")"
-            else:
-                self.consumir(Token("Operador", "."))
-                self.traducao += "."
-                self.consumir(
-                    Token("Identificador", self.tokens[self.indice].valor))
-                self.traducao += self.tokens[self.indice].valor
-                if self.checarToken(Token("Delimitador", "(")):
-                    self.consumir(Token("Delimitador", "("))
-                    self.traducao += "("
-                    if not self.checarToken(Token("Delimitador", ")")):
-                        self.arguments()
-                    self.consumir(Token("Delimitador", ")"))
-                    self.traducao += ")"
+            self.primary()
 
     def primary(self):
         if self.checarToken(Token("Palavra reservada", "true")):
@@ -339,85 +293,58 @@ class AnalisadorSintatico:
         elif self.checarToken(Token("Palavra reservada", "nil")):
             self.consumir(Token("Palavra reservada", "nil"))
             self.traducao += "None"
-        elif self.checarToken(Token("Palavra reservada", "this")):
-            self.consumir(Token("Palavra reservada", "this"))
-            self.traducao += "self"
         elif self.checarToken(Token("Numero", self.tokens[self.indice].valor)):
+            self.traducao += str(self.tokens[self.indice].valor)
             self.consumir(Token("Numero", self.tokens[self.indice].valor))
-            self.traducao += self.tokens[self.indice - 1].valor
-        elif self.checarToken(Token("Inteiro", self.tokens[self.indice].valor)):
-            self.consumir(Token("Inteiro", self.tokens[self.indice].valor))
-            self.traducao += self.tokens[self.indice - 1].valor
-        elif self.checarToken(Token("Ponto Flutuante", self.tokens[self.indice].valor)):
-            self.consumir(
-                Token("Ponto Flutuante", self.tokens[self.indice].valor))
-            self.traducao += self.tokens[self.indice - 1].valor
-        elif self.checarToken(Token("Constante Textual", self.tokens[self.indice].valor)):
-            self.consumir(Token("Constante Textual",
-                          self.tokens[self.indice].valor))
-            self.traducao += self.tokens[self.indice - 1].valor
+        elif self.checarToken(Token("String", self.tokens[self.indice].valor)):
+            self.traducao += f'"{self.tokens[self.indice].valor}"'
+            self.consumir(Token("String", self.tokens[self.indice].valor))
         elif self.checarToken(Token("Identificador", self.tokens[self.indice].valor)):
             identificador = self.tokens[self.indice].valor
             if identificador not in self.variaveis_declaradas:
                 raise ErroSintaticoException(
                     f"Variável '{identificador}' não declarada.")
-            self.consumir(
-                Token("Identificador", self.tokens[self.indice].valor))
-            self.traducao += self.tokens[self.indice - 1].valor
+            self.traducao += identificador
+            self.consumir(Token("Identificador", identificador))
         elif self.checarToken(Token("Delimitador", "(")):
             self.consumir(Token("Delimitador", "("))
+            self.traducao += "("
             self.expression()
             self.consumir(Token("Delimitador", ")"))
-        elif self.checarToken(Token("Palavra reservada", "super")):
-            self.consumir(Token("Palavra reservada", "super"))
-            self.traducao += "super."
-            self.consumir(Token("Operador", "."))
-            self.consumir(
-                Token("Identificador", self.tokens[self.indice - 1].valor))
-            self.traducao += self.tokens[self.indice - 1].valor
+            self.traducao += ")"
         else:
-            raise ErroSintaticoException(
-                f"{self.tokens[self.indice].tipo} '{self.tokens[self.indice].valor}'")
+            raise ErroSintaticoException(self.tokens[self.indice])
+
+    def tokenAnterior(self):
+        if self.indice > 0:
+            self.indice -= 1
 
     def function(self):
         identificador = self.tokens[self.indice].valor
         self.variaveis_declaradas.add(identificador)
-        self.consumir(Token("Identificador", self.tokens[self.indice].valor))
-        self.traducao += "def " + self.tokens[self.indice - 1].valor
+        self.consumir(Token("Identificador", identificador))
+        self.traducao += f"def {identificador}"
         self.consumir(Token("Delimitador", "("))
         self.traducao += "("
+
         if not self.checarToken(Token("Delimitador", ")")):
             self.parameters()
+
         self.consumir(Token("Delimitador", ")"))
-        self.traducao += ")"
+        self.traducao += "):\n"
+        self.traducao += "\t"
         self.block()
 
     def parameters(self):
-        print('------->')
-        # identificador = self.tokens[self.indice].valor
-        # self.variaveis_declaradas.add(identificador)
-        self.consumir(Token("Palavra reservada", "var"))
         identificador = self.tokens[self.indice].valor
+        self.consumir(Token("Identificador", identificador))
         self.variaveis_declaradas.add(identificador)
-        self.consumir(Token("Identificador", self.tokens[self.indice].valor))
-        self.traducao += self.tokens[self.indice - 1].valor
-        while self.checarToken(Token("Delimitador", ",")):
-            self.consumir(Token("Delimitador", ","))
-            self.traducao += ", "
-            self.consumir(
-                Token("Identificador", self.tokens[self.indice].valor))
-            self.traducao += self.tokens[self.indice - 1].valor
-
-    def arguments(self):
-        print('UUUUUUUUUUU')
-        self.expression()
+        self.traducao += identificador
 
         while self.checarToken(Token("Delimitador", ",")):
             self.consumir(Token("Delimitador", ","))
             self.traducao += ", "
-            self.expression(True)
-            
-    def tokenAnterior(self):
-            if self.indice > 0:
-                self.indice -= 1
-                return self.tokens[self.indice].valor
+            identificador = self.tokens[self.indice].valor
+            self.consumir(Token("Identificador", identificador))
+            self.variaveis_declaradas.add(identificador)
+            self.traducao += identificador
