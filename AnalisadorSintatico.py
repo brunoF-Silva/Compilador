@@ -129,9 +129,7 @@ class AnalisadorSintatico:
         self.traducao += "\n"
         
     def assignment(self):
-        print('ATRIBUICAO')
         if self.checarToken(Token("Identificador", self.tokens[self.indice].valor)):
-            print('AAAAAAAAAA---------------------------- ', self.var_float)
             identificador = self.tokens[self.indice].valor
             print(identificador)
             if identificador not in self.variaveis_declaradas:
@@ -142,21 +140,18 @@ class AnalisadorSintatico:
                 if self.indice + 1 < len(self.tokens):
                     if self.tokens[self.indice+1].valor == '=':
                         if self.indice + 2 < len(self.tokens):
-                            print('!!!!!!!!!!vamos ver ', self.tokens[self.indice+2].valor)
                             if isinstance(self.converter_texto(self.tokens[self.indice+2].valor), int) and identificador in self.var_int:
-                                print('É INTTTTTTTTT')
+                                print('/n')
                             else:
                                 raise ErroSintaticoException(
                                     f"Variável '{self.tokens[self.indice].valor}' não é do tipo inteiro.")
                                 
             if identificador in self.var_float:
-                print('CUUUUUU')
                 if self.indice + 1 < len(self.tokens):
                     if self.tokens[self.indice+1].valor == '=':
                         if self.indice + 2 < len(self.tokens):
-                            print('!!!!!!!!!!vamos ver ', self.tokens[self.indice+2].valor)
                             if isinstance(self.converter_texto(self.tokens[self.indice+2].valor), float) and identificador in self.var_float:
-                                print('É float')
+                                print('/n')
                             else:
                                 raise ErroSintaticoException(
                                     f"Variável '{self.tokens[self.indice].valor}' não é do tipo float.")
@@ -165,9 +160,8 @@ class AnalisadorSintatico:
                 if self.indice + 1 < len(self.tokens):
                     if self.tokens[self.indice+1].valor == '=':
                         if self.indice + 2 < len(self.tokens):
-                            print('!!!!!!!!!!vamos ver ', self.tokens[self.indice+2].valor)
                             if isinstance(self.converter_texto(self.tokens[self.indice+2].valor), str) and identificador in self.var_str:
-                                print('É float')
+                                print('/n')
                             else:
                                 raise ErroSintaticoException(
                                     f"Variável '{self.tokens[self.indice].valor}' não é do tipo float.")
@@ -175,39 +169,15 @@ class AnalisadorSintatico:
                 Token("Identificador", self.tokens[self.indice].valor))
             # self.traducao += self.tokens[self.indice - 1].valor
             if self.checarToken(Token("Operador", "=")):
-                print('jjjjjjj')
                 self.traducao += self.tokens[self.indice - 1].valor
                 self.consumir(Token("Operador", "="))
                 self.traducao += " = "
                 self.assignment()
             else:
-                print('kkkkkk')
                 self.tokenAnterior()
                 self.logic_or()
         else:
             self.logic_or()
-    # def assignment(self):
-    #     print('OI')
-    #     if self.checarToken(Token("Identificador", self.tokens[self.indice].valor)):
-    #         print('oiiii')
-    #         identificador = self.tokens[self.indice].valor
-    #         if identificador not in self.variaveis_declaradas:
-    #             raise ErroSintaticoException(
-    #                 f"Variável '{identificador}' não declarada.")
-    #         self.consumir(
-    #             Token("Identificador", self.tokens[self.indice].valor))
-    #         # self.traducao += self.tokens[self.indice - 1].valor
-    #         if self.checarToken(Token("Operador", "=")):
-    #             self.traducao += self.tokens[self.indice - 1].valor
-    #             self.consumir(Token("Operador", "="))
-    #             self.traducao += " = "
-    #             self.assignment()
-    #         else:
-    #             self.tokenAnterior()
-    #             self.logic_or()
-    #     else:
-    #         print('oi')
-    #         self.logic_or()
             
     def statement(self):
         if self.checarToken(Token("Palavra reservada", "for")):
@@ -544,7 +514,7 @@ class AnalisadorSintatico:
                 self.traducao += self.tokens[self.indice - 1].valor
 
     def arguments(self):
-        print('UUUUUUUUUUU')
+        print('----------->')
         self.expression()
 
         while self.checarToken(Token("Delimitador", ",")):
