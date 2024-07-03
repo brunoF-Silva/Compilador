@@ -4,11 +4,11 @@ def a2(b):
 	return b / 2
 print(a1(4) * a2(10))
 print(a2(5) / a1(50))
-c = 5.8
+c = 5
 
 if a1(4) > 5:
 	print("ok")
 
-c = 40.2
+c = 7
 
 print(c)

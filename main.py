@@ -1,38 +1,24 @@
-# from AnalisadorLexico import AnalisadorLexico
-# from AnalisadorSintatico import AnalisadorSintatico
-# from AnalisadorSemantico import AnalisadorSemantico
+'''
+Curso: Ciência da Computação
+Campus Universitário de Palmas
+Disciplina: Compiladores
+Professora Dra.: Anna Paula de Souza Parentes Rodrigues
+Alunos: Bruno Ferreira da Silva e Izabela Caldeira Sena Ferreira
 
-
-# def main():
-#     arquivo = "testes/exemplo.c"
-
-#     analisador_lexico = AnalisadorLexico(arquivo)
-#     analisador_lexico.analisar_e_mostrar_resultado()
-
-#     tokens = analisador_lexico.obter_tokens()
-
-#     analisador_sintatico = AnalisadorSintatico(tokens)
-#     analisador_sintatico.analisar_e_traduzir()
-
-#     analisador_semantico = AnalisadorSemantico(tokens)
-#     analisador_semantico.analisar()
-
-
-# if __name__ == "__main__":
-#     main()
+'''
 
 from AnalisadorLexico import AnalisadorLexico
-from AnalisadorSintatico import AnalisadorSintatico, ErroSintaticoException
+from AnalisadorSintaticoESemantico import AnalisadorSintatico, ErroSintaticoException
 
 
 def main():
-    arquivo = "exemplo5.c"
+    arquivo = "exemplo1.c"
 
     analisador_lexico = AnalisadorLexico(arquivo)
     analisador_lexico.analisar_e_mostrar_resultado()
 
     tokens = analisador_lexico.obter_tokens()
-    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    print("\nAnálise Sintática e Semântica\n")
     analisador_sintatico = AnalisadorSintatico(tokens)
     try:
         analisador_sintatico.analisar_e_traduzir()
@@ -42,39 +28,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# from AnalisadorLexico import AnalisadorLexico
-# # from AnalisadorSintatico import AnalisadorSintatico
-# from AnalisadorSemantico import AnalisadorSintatico
-# def main():
-#     arquivo = "testes\exemplo5.c"
-
-
-#     analisador_lexico = AnalisadorLexico(arquivo)
-#     analisador_lexico.analisar_e_mostrar_resultado()
-
-#     tokens = analisador_lexico.obter_tokens()
-
-#     analisador_sintatico = AnalisadorSintatico(tokens)
-#     analisador_sintatico.analisar_e_traduzir()
-
-# if __name__ == "__main__":
-#     main()

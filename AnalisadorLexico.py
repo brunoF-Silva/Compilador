@@ -1,69 +1,11 @@
-# import re
+'''
+Curso: Ciência da Computação
+Campus Universitário de Palmas
+Disciplina: Compiladores
+Professora Dra.: Anna Paula de Souza Parentes Rodrigues
+Alunos: Bruno Ferreira da Silva e Izabela Caldeira Sena Ferreira
 
-
-# class Token:
-#     def __init__(self, tipo, valor, linha, coluna):
-#         self.tipo = tipo
-#         self.valor = valor
-#         self.linha = linha
-#         self.coluna = coluna
-
-#     def __str__(self):
-#         return f"{self.tipo}('{self.valor}') na linha {self.linha}, coluna {self.coluna}"
-
-
-# class AnalisadorLexico:
-#     def __init__(self, arquivo):
-#         self.arquivo = arquivo
-#         self.tokens = []
-
-#     def analisar_e_mostrar_resultado(self):
-#         try:
-#             with open(self.arquivo, 'r') as arquivo:
-#                 codigo = arquivo.read()
-#                 self.analisar(codigo)
-#                 for token in self.tokens:
-#                     print(token)
-#         except FileNotFoundError:
-#             print(f"Arquivo {self.arquivo} não encontrado.")
-
-#     def analisar(self, codigo):
-#         padroes = {
-#             'Palavra reservada': r'\b(class|fun|if|else|while|for|return|var|print|true|false|nil|and|or|this|super)\b',
-#             'Operador': r'(\+|-|\*|\/|!=|==|<=|>=|<|>|=|!)',
-#             'Delimitador': r'(\(|\)|\{|\}|\[|\]|,|;|\.|:)',
-#             'Identificador': r'\b[a-zA-Z_][a-zA-Z0-9_]*\b',
-#             'Constante Textual': r'"[^"\n]*"',
-#             'Ponto Flutuante': r'\b\d+\.\d+\b',
-#             'Inteiro': r'\b\d+\b'
-#         }
-
-#         linha, coluna = 1, 1
-#         i = 0
-#         while i < len(codigo):
-#             match = None
-#             for tipo, padrao in padroes.items():
-#                 regex = re.compile(padrao)
-#                 match = regex.match(codigo, i)
-#                 if match:
-#                     valor = match.group(0)
-#                     self.tokens.append(Token(tipo, valor, linha, coluna))
-#                     i += len(valor)
-#                     coluna += len(valor)
-#                     break
-#             if not match:
-#                 if codigo[i] in [' ', '\t']:
-#                     coluna += 1
-#                 elif codigo[i] == '\n':
-#                     linha += 1
-#                     coluna = 1
-#                 else:
-#                     raise SyntaxError(
-#                         f"Caractere inválido '{codigo[i]}' na linha {linha}, coluna {coluna}")
-#                 i += 1
-
-#     def obter_tokens(self):
-#         return self.tokens
+'''
 
 import re
 

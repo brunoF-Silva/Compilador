@@ -1,3 +1,12 @@
+'''
+Curso: Ciência da Computação
+Campus Universitário de Palmas
+Disciplina: Compiladores
+Professora Dra.: Anna Paula de Souza Parentes Rodrigues
+Alunos: Bruno Ferreira da Silva e Izabela Caldeira Sena Ferreira
+
+'''
+
 from AnalisadorLexico import Token
 
 
@@ -77,7 +86,6 @@ class AnalisadorSintatico:
         self.function()
 
     def varDecl(self):
-        print('Declaração ', self.tokens[self.indice].valor)
         if self.checarToken('Palavra reservada', 'int'):
             identificador = self.tokens[self.indice].valor
             self.consumir(Token("Palavra reservada", "int"))
@@ -131,7 +139,6 @@ class AnalisadorSintatico:
     def assignment(self):
         if self.checarToken(Token("Identificador", self.tokens[self.indice].valor)):
             identificador = self.tokens[self.indice].valor
-            print(identificador)
             if identificador not in self.variaveis_declaradas:
                 raise ErroSintaticoException(
                     f"Variável '{identificador}' não declarada.")
@@ -141,7 +148,7 @@ class AnalisadorSintatico:
                     if self.tokens[self.indice+1].valor == '=':
                         if self.indice + 2 < len(self.tokens):
                             if isinstance(self.converter_texto(self.tokens[self.indice+2].valor), int) and identificador in self.var_int:
-                                print('/n')
+                                pass
                             else:
                                 raise ErroSintaticoException(
                                     f"Variável '{self.tokens[self.indice].valor}' não é do tipo inteiro.")
@@ -151,7 +158,7 @@ class AnalisadorSintatico:
                     if self.tokens[self.indice+1].valor == '=':
                         if self.indice + 2 < len(self.tokens):
                             if isinstance(self.converter_texto(self.tokens[self.indice+2].valor), float) and identificador in self.var_float:
-                                print('/n')
+                                pass
                             else:
                                 raise ErroSintaticoException(
                                     f"Variável '{self.tokens[self.indice].valor}' não é do tipo float.")
@@ -161,10 +168,10 @@ class AnalisadorSintatico:
                     if self.tokens[self.indice+1].valor == '=':
                         if self.indice + 2 < len(self.tokens):
                             if isinstance(self.converter_texto(self.tokens[self.indice+2].valor), str) and identificador in self.var_str:
-                                print('/n')
+                                pass
                             else:
                                 raise ErroSintaticoException(
-                                    f"Variável '{self.tokens[self.indice].valor}' não é do tipo float.")
+                                    f"Variável '{self.tokens[self.indice].valor}' não é do tipo str.")
             self.consumir(
                 Token("Identificador", self.tokens[self.indice].valor))
             # self.traducao += self.tokens[self.indice - 1].valor
@@ -396,7 +403,6 @@ class AnalisadorSintatico:
             self.call()
 
     def call(self):
-        print('_______________')
         self.primary()
         while self.checarToken(Token("Delimitador", "(")) or self.checarToken(Token("Operador", ".")):
             if self.checarToken(Token("Delimitador", "(")):
@@ -484,7 +490,6 @@ class AnalisadorSintatico:
         self.block()
 
     def parameters(self):
-        print('------->')
         # identificador = self.tokens[self.indice].valor
         # self.variaveis_declaradas.add(identificador)
         if(self.checarToken("Palavra reservada", "int")):
@@ -514,7 +519,6 @@ class AnalisadorSintatico:
                 self.traducao += self.tokens[self.indice - 1].valor
 
     def arguments(self):
-        print('----------->')
         self.expression()
 
         while self.checarToken(Token("Delimitador", ",")):
